@@ -1,0 +1,195 @@
+{% extends 'menu/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="confirmation-content">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your order. We'll start preparing it right away.</p>
+        
+        <div class="order-details">
+            <h2>Order Details</h2>
+            <div id="order-info">
+                <!-- Order details will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="confirmation-actions">
+            <a href="{% url 'menu:home' %}" class="btn">Continue Shopping</a>
+            <a href="{% url 'menu:order' %}" class="btn">Place Another Order</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmation-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.confirmation-content {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #4CAF50;
+    margin-bottom: 1.5rem;
+}
+
+.confirmation-content h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.confirmation-content p {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.order-details {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 2rem;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.order-details h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detail-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #333;
+    font-weight: 600;
+}
+
+.detail-row.total {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #eee;
+    font-size: 1.2rem;
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    background: #ff4b2b;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
+    background: #ff416c;
+}
+
+@media (max-width: 768px) {
+    .confirmation-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const orderInfo = document.getElementById('order-info');
+    const orderDetails = JSON.parse(localStorage.getItem('orderDetails'));
+    
+    if (orderDetails) {
+        const html = `
+            <div class="detail-row">
+                <span class="detail-label">Name</span>
+                <span class="detail-value">${orderDetails.name}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">${orderDetails.phone}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Address</span>
+                <span class="detail-value">${orderDetails.address}</span>
+            </div>
+            ${orderDetails.landmark ? `
+            <div class="detail-row">
+                <span class="detail-label">Landmark</span>
+                <span class="detail-value">${orderDetails.landmark}</span>
+            </div>
+            ` : ''}
+            ${orderDetails.instructions ? `
+            <div class="detail-row">
+                <span class="detail-label">Delivery Instructions</span>
+                <span class="detail-value">${orderDetails.instructions}</span>
+            </div>
+            ` : ''}
+            <div class="detail-row">
+                <span class="detail-label">Subtotal</span>
+                <span class="detail-value">₹${orderDetails.subtotal.toFixed(2)}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Delivery Fee</span>
+                <span class="detail-value">₹${orderDetails.delivery_fee.toFixed(2)}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Tax (5%)</span>
+                <span class="detail-value">₹${orderDetails.tax.toFixed(2)}</span>
+            </div>
+            <div class="detail-row total">
+                <span class="detail-label">Total Amount</span>
+                <span class="detail-value">₹${orderDetails.total.toFixed(2)}</span>
+            </div>
+        `;
+        orderInfo.innerHTML = html;
+        
+        // Clear order details from localStorage
+        localStorage.removeItem('orderDetails');
+    } else {
+        orderInfo.innerHTML = '<p>Order details not found.</p>';
+    }
+});
+</script>
+{% endblock %} 

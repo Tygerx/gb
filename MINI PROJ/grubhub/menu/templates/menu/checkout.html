@@ -1,0 +1,628 @@
+{% extends 'menu/base.html' %}
+{% load static %}
+{% load menu_filters %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #8B4513;  /* Brown */
+        --secondary-color: #FF4500;  /* Red */
+        --accent-color: #FFD700;  /* Yellow */
+        --dark-color: #2C1810;  /* Dark Brown */
+        --light-color: #FFF8DC;  /* Light Yellow */
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+        color: var(--light-color);
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .checkout-container {
+        max-width: 1200px;
+        margin: 80px auto 0;
+        padding: 2rem;
+    }
+
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .checkout-header h1 {
+        color: var(--accent-color);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .checkout-header p {
+        color: var(--light-color);
+        opacity: 0.8;
+    }
+
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .cart-items-section, .order-summary {
+        background: rgba(44, 24, 16, 0.95);
+        padding: 2rem;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .summary-title {
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .cart-item-card {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .cart-item-image {
+        width: 80px;
+        height: 80px;
+        margin-right: 1rem;
+    }
+
+    .cart-item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--accent-color);
+    }
+
+    .cart-item-details {
+        flex: 1;
+    }
+
+    .cart-item-name {
+        color: var(--accent-color);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .cart-item-price {
+        color: var(--light-color);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .cart-item-quantity {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .quantity-btn {
+        background: var(--secondary-color);
+        color: var(--light-color);
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        background: var(--primary-color);
+        transform: scale(1.1);
+    }
+
+    .quantity-value {
+        color: var(--light-color);
+        min-width: 25px;
+        text-align: center;
+    }
+
+    .remove-item {
+        background: none;
+        border: none;
+        color: #ff4444;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .remove-item:hover {
+        color: #ff0000;
+        transform: scale(1.1);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: var(--light-color);
+    }
+
+    .summary-row.total {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .checkout-form {
+        margin-top: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--light-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: var(--light-color);
+        font-size: 1rem;
+    }
+
+    .form-group textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+        color: var(--light-color);
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .place-order-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .place-order-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .empty-cart i {
+        font-size: 3rem;
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-cart h3 {
+        color: var(--accent-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-cart p {
+        color: var(--light-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .back-to-menu {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+        color: var(--light-color);
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .back-to-menu:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .messages {
+        margin-bottom: 2rem;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .alert-success {
+        background: rgba(0, 255, 0, 0.1);
+        color: #00ff00;
+        border: 1px solid rgba(0, 255, 0, 0.2);
+    }
+
+    .alert-error {
+        background: rgba(255, 0, 0, 0.1);
+        color: #ff0000;
+        border: 1px solid rgba(255, 0, 0, 0.2);
+    }
+
+    .alert-warning {
+        background: rgba(255, 255, 0, 0.1);
+        color: #ffff00;
+        border: 1px solid rgba(255, 255, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .checkout-container {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Review your order and complete your purchase</p>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="checkout-grid">
+        <div class="cart-items-section">
+            <h2 class="summary-title">Your Order</h2>
+            {% if cart_items %}
+                {% for cart_item in cart_items %}
+                    <div class="cart-item-card">
+                        <div class="cart-item-image">
+                            {% if cart_item.item.image %}
+                                <img src="{{ cart_item.item.image.url }}" alt="{{ cart_item.item.name }}">
+                            {% else %}
+                                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiM4QjQ1MTMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCI+RGVsbGljaW91cyBGb29kPC90ZXh0Pjwvc3ZnPg==" alt="{{ cart_item.item.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="cart-item-details">
+                            <h3 class="cart-item-name">{{ cart_item.item.name }}</h3>
+                            <p class="cart-item-price">₹{{ cart_item.item.price }}</p>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="updateQuantity({{ cart_item.item.id }}, {{ cart_item.quantity|add:'-1' }})">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="quantity-value">{{ cart_item.quantity }}</span>
+                                <button class="quantity-btn" onclick="updateQuantity({{ cart_item.item.id }}, {{ cart_item.quantity|add:'1' }})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="remove-item" onclick="removeItem({{ cart_item.item.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Add some delicious items to your cart!</p>
+                    <a href="{% url 'menu:order' %}" class="back-to-menu">
+                        <i class="fas fa-shopping-bag"></i>
+                        Back to Menu
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="order-summary">
+            <h2 class="summary-title">Order Summary</h2>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹{{ subtotal }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span>₹{{ delivery_fee }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax (5%)</span>
+                <span>₹{{ tax }}</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>₹{{ total }}</span>
+            </div>
+
+            <form class="checkout-form" id="checkoutForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Delivery Address</label>
+                    <textarea id="address" name="address" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="landmark">Landmark (Optional)</label>
+                    <input type="text" id="landmark" name="landmark">
+                </div>
+                <div class="form-group">
+                    <label for="instructions">Delivery Instructions (Optional)</label>
+                    <textarea id="instructions" name="instructions"></textarea>
+                </div>
+                <button type="submit" class="place-order-btn" id="placeOrderBtn">
+                    <i class="fas fa-lock"></i>
+                    Place Order
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkoutForm');
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Disable the button to prevent double submission
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        const formData = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            landmark: document.getElementById('landmark').value,
+            instructions: document.getElementById('instructions').value
+        };
+
+        // Initialize Razorpay options
+        const options = {
+            key: '{{ razorpay_key_id }}',
+            amount: {{ total|multiply:100 }},
+            currency: 'INR',
+            name: 'GrubHub',
+            description: 'Food Order Payment',
+            order_id: '{{ razorpay_order_id }}',
+            handler: function(response) {
+                handlePaymentSuccess(response, formData);
+            },
+            prefill: {
+                name: formData.name,
+                contact: formData.phone,
+                email: '{{ user.email }}'
+            },
+            theme: {
+                color: '#8B4513'
+            }
+        };
+
+        try {
+            // Create Razorpay instance
+            const rzp = new Razorpay(options);
+
+            // Open Razorpay payment modal
+            rzp.open();
+
+            // Handle payment errors
+            rzp.on('payment.failed', function(response) {
+                handlePaymentFailure(response);
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+            });
+        } catch (error) {
+            console.error('Razorpay error:', error);
+            showToast('Payment gateway error. Please try again later.', 'error');
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+        }
+    });
+});
+
+function handlePaymentSuccess(response, formData) {
+    // Send payment data to server
+    fetch('{% url "menu:payment_success" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            ...formData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Store order details in localStorage
+            localStorage.setItem('orderDetails', JSON.stringify({
+                ...formData,
+                subtotal: {{ subtotal }},
+                delivery_fee: {{ delivery_fee }},
+                tax: {{ tax }},
+                total: {{ total }},
+                payment_id: response.razorpay_payment_id
+            }));
+            window.location.href = '{% url "menu:order_confirmation" %}';
+        } else {
+            showToast(data.error || 'Payment verification failed. Please try again.', 'error');
+            document.getElementById('placeOrderBtn').disabled = false;
+            document.getElementById('placeOrderBtn').innerHTML = '<i class="fas fa-lock"></i> Place Order';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Payment verification failed. Please try again.', 'error');
+        document.getElementById('placeOrderBtn').disabled = false;
+        document.getElementById('placeOrderBtn').innerHTML = '<i class="fas fa-lock"></i> Place Order';
+    });
+}
+
+function handlePaymentFailure(response) {
+    // Send failure data to server
+    fetch('{% url "menu:payment_failure" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(response)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            showToast('Payment failed. Please try again.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Payment failed. Please try again.', 'error');
+    });
+}
+
+function updateQuantity(itemId, newQuantity) {
+    if (newQuantity < 1) {
+        if (confirm('Are you sure you want to remove this item from your cart?')) {
+            removeItem(itemId);
+        }
+        return;
+    }
+
+    fetch(`{% url 'menu:update_cart' 0 %}`.replace('0', itemId), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ quantity: newQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            location.reload();
+        } else if (data.error) {
+            showToast(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to update quantity. Please try again.', 'error');
+    });
+}
+
+function removeItem(itemId) {
+    fetch(`{% url 'menu:remove_from_cart' 0 %}`.replace('0', itemId), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            location.reload();
+        } else if (data.error) {
+            showToast(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to remove item. Please try again.', 'error');
+    });
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %} 

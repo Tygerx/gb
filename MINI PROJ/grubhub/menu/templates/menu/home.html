@@ -1,0 +1,90 @@
+{% extends 'menu/base.html' %}
+
+{% block content %}
+<div class="home-container">
+    <div class="home-header">
+        <h1>Welcome to GrubHub</h1>
+        <p>Your favorite food delivery service</p>
+    </div>
+    
+    <div class="home-content">
+        <div class="home-card">
+            <h2>Hungry? Order Now!</h2>
+            <p>Browse our delicious menu and place your order</p>
+            <a href="{% url 'menu:order' %}" class="order-now-btn">
+                <i class="fas fa-utensils"></i>
+                Order Now
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .home-container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .home-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .home-header h1 {
+        color: var(--primary-color);
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .home-header p {
+        color: var(--dark-color);
+        font-size: 1.2rem;
+    }
+
+    .home-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+    }
+
+    .home-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .home-card h2 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .home-card p {
+        color: var(--dark-color);
+        margin-bottom: 2rem;
+    }
+
+    .order-now-btn {
+        background: linear-gradient(45deg, var(--accent-color), #ff8c42);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .order-now-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}

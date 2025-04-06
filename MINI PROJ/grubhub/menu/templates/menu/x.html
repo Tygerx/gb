@@ -1,0 +1,644 @@
+{% extends 'menu/base.html' %}
+{% load static %}
+{% load menu_filters %}
+
+{% block title %}X Page{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #8B4513;  /* Brown */
+        --secondary-color: #FF4500;  /* Red */
+        --accent-color: #FFD700;  /* Yellow */
+        --dark-color: #2C1810;  /* Dark Brown */
+        --light-color: #FFF8DC;  /* Light Yellow */
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+        color: var(--light-color);
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .x-container {
+        max-width: 1200px;
+        margin: 80px auto 0;
+        padding: 2rem;
+    }
+
+    .x-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .x-header h1 {
+        color: var(--accent-color);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .x-header p {
+        color: var(--light-color);
+        opacity: 0.8;
+    }
+
+    .x-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .x-section {
+        background: rgba(44, 24, 16, 0.95);
+        padding: 2rem;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section-title {
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .cart-items {
+        margin-bottom: 2rem;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1rem;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .cart-item img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 1rem;
+        border: 2px solid var(--accent-color);
+    }
+
+    .cart-item-details {
+        flex: 1;
+    }
+
+    .cart-item-name {
+        color: var(--accent-color);
+        font-size: 1.1rem;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .cart-item-price {
+        color: var(--light-color);
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .cart-item-quantity {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .quantity-btn {
+        background: var(--secondary-color);
+        color: var(--light-color);
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        background: var(--primary-color);
+        transform: scale(1.1);
+    }
+
+    .quantity-value {
+        color: var(--light-color);
+        font-size: 1rem;
+        min-width: 25px;
+        text-align: center;
+    }
+
+    .bill-details {
+        margin-top: 2rem;
+    }
+
+    .bill-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: var(--light-color);
+    }
+
+    .bill-row.total {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .order-type-toggle {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--secondary-color);
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: var(--accent-color);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .deals-section {
+        margin-top: 2rem;
+    }
+
+    .deal-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .deal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .deal-title {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .deal-description {
+        color: var(--light-color);
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    .back-to-menu {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+        color: var(--light-color);
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+    }
+
+    .back-to-menu:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .x-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .x-container {
+            padding: 1rem;
+        }
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+        background-color: var(--dark-color);
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid var(--accent-color);
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+        text-align: center;
+        color: var(--light-color);
+    }
+
+    .close {
+        color: var(--accent-color);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: var(--secondary-color);
+    }
+
+    .qr-container {
+        margin: 20px 0;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+
+    .qr-container img {
+        max-width: 200px;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .pay-button {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+        color: var(--light-color);
+        text-decoration: none;
+        border-radius: 50px;
+        margin-top: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .pay-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Toast Styles */
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: var(--dark-color);
+        color: var(--light-color);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.5s ease forwards;
+        z-index: 1000;
+    }
+
+    .toast.error {
+        border-left: 4px solid var(--secondary-color);
+    }
+
+    .toast.success {
+        border-left: 4px solid var(--accent-color);
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="x-container">
+    <div class="x-header">
+        <h1>Your Order</h1>
+        <p>Review your items and proceed to payment</p>
+    </div>
+
+    <div class="x-grid">
+        <div class="x-section">
+            <h2 class="section-title">Bill Details</h2>
+            <div class="bill-details">
+                <div class="bill-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₹0.00</span>
+                </div>
+                <div class="bill-row">
+                    <span>CGST (2.5%)</span>
+                    <span id="cgst">₹0.00</span>
+                </div>
+                <div class="bill-row">
+                    <span>SGST (2.5%)</span>
+                    <span id="sgst">₹0.00</span>
+                </div>
+                <div class="bill-row total">
+                    <span>Total Amount</span>
+                    <span id="total">₹0.00</span>
+                </div>
+            </div>
+
+            <h2 class="section-title">Special Deals</h2>
+            <div class="deals-section">
+                <div class="deal-card">
+                    <h3 class="deal-title">Weekend Special</h3>
+                    <p class="deal-description">Get 15% off on all orders above ₹500 on weekends!</p>
+                </div>
+                <div class="deal-card">
+                    <h3 class="deal-title">Family Pack</h3>
+                    <p class="deal-description">Order for 4 or more people and get 20% off on the total bill.</p>
+                </div>
+                <div class="deal-card">
+                    <h3 class="deal-title">Happy Hours</h3>
+                    <p class="deal-description">Enjoy 25% off on beverages between 4 PM to 7 PM.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="x-section">
+            <h2 class="section-title">Your Cart Items</h2>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <button onclick="handlePayment()" class="nav-button" style="margin-right: 1rem;">
+            <i class="fas fa-credit-card"></i>
+            Proceed to Payment
+        </button>
+        <a href="{% url 'menu:order' %}" class="back-to-menu">
+            <i class="fas fa-arrow-left"></i>
+            Back to Menu
+        </a>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch cart items
+    fetch('{% url "menu:view_cart" %}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.cart_items) {
+                updateCartItems(data.cart_items);
+                updateBillDetails(data.cart_items);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching cart:', error);
+        });
+});
+
+function updateCartItems(cartItems) {
+    const cartContainer = document.getElementById('cartItems');
+    if (!cartItems || cartItems.length === 0) {
+        cartContainer.innerHTML = '<p>Your cart is empty</p>';
+        return;
+    }
+
+    const html = cartItems.map(item => `
+        <div class="cart-item">
+            <img src="${item.item.image}" alt="${item.item.name}" onerror="this.src='/static/menu/images/default-food.jpg'">
+            <div class="cart-item-details">
+                <h3 class="cart-item-name">${item.item.name}</h3>
+                <p class="cart-item-price">₹${item.item.price}</p>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" onclick="updateCart(${item.item.id}, ${item.quantity - 1})">-</button>
+                    <span class="quantity-value">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateCart(${item.item.id}, ${item.quantity + 1})">+</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    cartContainer.innerHTML = html;
+}
+
+function updateBillDetails(cartItems) {
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
+    const cgst = subtotal * 0.025;
+    const sgst = subtotal * 0.025;
+    const total = subtotal + cgst + sgst;
+
+    document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+    document.getElementById('cgst').textContent = `₹${cgst.toFixed(2)}`;
+    document.getElementById('sgst').textContent = `₹${sgst.toFixed(2)}`;
+    document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+}
+
+function updateCart(itemId, newQuantity) {
+    if (newQuantity < 1) return;
+
+    const csrfToken = getCookie('csrftoken');
+    if (!csrfToken) {
+        showToast('Session expired. Please refresh the page.', 'error');
+        return;
+    }
+
+    fetch(`{% url 'menu:update_cart' 0 %}`.replace('0', itemId), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ quantity: newQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'error');
+        } else {
+            updateCartItems(data.cart_items);
+            updateBillDetails(data.cart_items);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to update cart. Please try again.', 'error');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+function handlePayment() {
+    const total = parseFloat(document.getElementById('total').textContent.replace('₹', ''));
+    
+    if (total <= 0) {
+        showToast('Your cart is empty. Please add items before proceeding to payment.', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const paymentButton = document.querySelector('.nav-button');
+    const originalText = paymentButton.innerHTML;
+    paymentButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    paymentButton.disabled = true;
+    
+    const csrfToken = getCookie('csrftoken');
+    if (!csrfToken) {
+        showToast('Session expired. Please refresh the page.', 'error');
+        paymentButton.innerHTML = originalText;
+        paymentButton.disabled = false;
+        return;
+    }
+
+    // Create a Razorpay order
+    fetch('{% url "menu:checkout" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            amount: Math.round(total * 100),  // Convert to paise
+            currency: 'INR'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Create QR code modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Scan QR Code to Pay</h2>
+                    <div class="qr-container">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.payment_link)}" alt="Payment QR Code">
+                    </div>
+                    <p>Amount: ₹${(data.amount / 100).toFixed(2)}</p>
+                    <p>Or click below to pay online</p>
+                    <a href="${data.payment_link}" target="_blank" class="pay-button">Pay Online</a>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking the X
+            modal.querySelector('.close').onclick = function() {
+                modal.style.display = 'none';
+                modal.remove();
+                paymentButton.innerHTML = originalText;
+                paymentButton.disabled = false;
+            }
+            
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    modal.remove();
+                    paymentButton.innerHTML = originalText;
+                    paymentButton.disabled = false;
+                }
+            }
+        } else {
+            console.error('Order creation failed:', data.error);
+            showToast(data.error || 'Failed to create payment order. Please try again.', 'error');
+            paymentButton.innerHTML = originalText;
+            paymentButton.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        showToast('Failed to create payment order. Please try again.', 'error');
+        paymentButton.innerHTML = originalText;
+        paymentButton.disabled = false;
+    });
+}
+</script>
+{% endblock %} 

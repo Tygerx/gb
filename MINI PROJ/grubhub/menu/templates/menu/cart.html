@@ -1,0 +1,461 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GrubHub - Your Cart</title>
+    <style>
+        :root {
+            --primary-color: #8B4513;  /* Brown */
+            --secondary-color: #FF4500;  /* Red */
+            --accent-color: #FFD700;  /* Yellow */
+            --dark-color: #2C1810;  /* Dark Brown */
+            --light-color: #FFF8DC;  /* Light Yellow */
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+            color: var(--light-color);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(44, 24, 16, 0.95);
+            padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: var(--light-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .cart-container {
+            max-width: 1200px;
+            margin: 100px auto 2rem;
+            padding: 2rem;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .cart-title {
+            color: var(--accent-color);
+            font-size: 2rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cart-items {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 1.5rem;
+            border: 2px solid var(--accent-color);
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .cart-item-price {
+            color: var(--light-color);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .quantity-btn {
+            background: var(--secondary-color);
+            color: var(--light-color);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .quantity-value {
+            color: var(--light-color);
+            font-size: 1.1rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-item:hover {
+            color: #ff0000;
+            transform: scale(1.1);
+        }
+
+        .cart-summary {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: var(--light-color);
+        }
+
+        .summary-row.total {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .checkout-btn {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: var(--light-color);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .empty-cart i {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart h2 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart p {
+            color: var(--light-color);
+            margin-bottom: 2rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: var(--light-color);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(120%);
+            animation: slideIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .toast.success {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+        }
+
+        .toast.error {
+            background: linear-gradient(45deg, #d63031, #e17055);
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-buttons">
+            <a href="{% url 'menu:order' %}" class="nav-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Menu
+            </a>
+            <a href="/admin/login/" class="nav-button">
+                <i class="fas fa-user"></i>
+                Login
+            </a>
+        </div>
+    </div>
+
+    <div class="cart-container">
+        <div class="cart-header">
+            <h1 class="cart-title">Your Cart</h1>
+        </div>
+
+        <div class="cart-items">
+            {% if cart_items %}
+                {% for item in cart_items %}
+                    <div class="cart-item" data-item-id="{{ item.item.id }}">
+                        <img src="{{ item.item.image.url }}" alt="{{ item.item.name }}" onerror="this.src='{% static 'menu/images/default-food.jpg' %}'">
+                        <div class="cart-item-details">
+                            <h3 class="cart-item-name">{{ item.item.name }}</h3>
+                            <p class="cart-item-price">₹{{ item.item.price }}</p>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="updateCart({{ item.item.id }}, {{ item.quantity|add:'-1' }})">-</button>
+                                <span class="quantity-value">{{ item.quantity }}</span>
+                                <button class="quantity-btn" onclick="updateCart({{ item.item.id }}, {{ item.quantity|add:'1' }})">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-item" onclick="removeFromCart({{ item.item.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+        {% endfor %}
+            {% else %}
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h2>Your cart is empty</h2>
+                    <p>Add some delicious items to your cart!</p>
+                    <a href="{% url 'menu:order' %}" class="nav-button">
+                        <i class="fas fa-shopping-bag"></i>
+                        Continue Shopping
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if cart_items %}
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{{ total }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Fee</span>
+                    <span>₹40</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax (5%)</span>
+                    <span>₹{{ total|multiply:0.05|floatformat:2 }}</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>₹{{ total|add:40|add:total|multiply:0.05|floatformat:2 }}</span>
+                </div>
+                <a href="{% url 'menu:checkout' %}" class="checkout-btn">
+                    <i class="fas fa-check"></i>
+                    Proceed to Checkout
+                </a>
+            </div>
+        {% endif %}
+</div>
+
+<script>
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.5s ease forwards';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        function updateCart(itemId, newQuantity) {
+            if (newQuantity < 1) {
+                removeFromCart(itemId);
+        } else {
+                fetch(`/menu/cart/update/${itemId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ quantity: newQuantity })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.message) {
+                        location.reload();
+                    } else if (data.error) {
+                        showToast(data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to update cart.', 'error');
+                });
+            }
+        }
+
+        function removeFromCart(itemId) {
+            fetch(`/menu/cart/remove/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message) {
+                    location.reload();
+                } else if (data.error) {
+                    showToast(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to remove item from cart.', 'error');
+            });
+    }
+</script>
+</body>
+</html>
